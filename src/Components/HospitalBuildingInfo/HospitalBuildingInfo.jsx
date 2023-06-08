@@ -1,67 +1,76 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
 import ApartmentIcon from '@mui/icons-material/Apartment';
 import Typography from '@mui/material/Typography';
+import FloorInfo from './FloorInfo/FloorInfo';
 
+// Function to generate an array of room numbers
+const generateRoomNumbers = (count) => {
+    // Create an array of length 'count' and map each element to its index plus 1
+    return Array.from({ length: count }, (_, index) => index + 1);
+};
 
-const tabLabels = [
-    'طبقه اول بخش روماتولوژی',
-    'طبقه اول بخش ارتوپدی',
-    'طبقه دوم بخش روماتولوژِی',
-    'طبقه دوم بخش کودکان',
-    'طبقه دوم بخش ارتوپدی',
-];
+const HospitalBuildingInfo = ({ tabLabels, BuildingName }) => {
+    const [value, setValue] = useState(0); // State to track the currently selected tab index
 
-export default function HospitalBuildingInfo() {
-    const [value, setValue] = React.useState(0);
-
-    const handleChange = (event, newValue) => {
-        setValue(newValue);
+    const handleChange = (_, newValue) => {
+        setValue(newValue); // Update the selected tab when it changes
     };
 
-    function TabPanel(props) {
-        const { children, value, index, ...other } = props;
-
-        return (
-            <div
-                role="tabpanel"
-                hidden={value !== index}
-                id={`simple-tabpanel-${index}`}
-                aria-labelledby={`simple-tab-${index}`}
-                {...other}
-            >
-                {value === index && (
-                    <Box sx={{ p: 3 }}>
-                        <Typography>{children}</Typography>
-                    </Box>
-                )}
-            </div>
-        );
-    }
+    // Component to render a tab panel with its content
+    const TabPanel = ({ children, index }) => (
+        <div
+            role="tabpanel"
+            hidden={value !== index} // Hide the panel if its index doesn't match the selected tab index
+            id={`simple-tabpanel-${index}`}
+            aria-labelledby={`simple-tab-${index}`}
+        >
+            {value === index && ( // Only render the content if the panel is currently selected
+                <Box sx={{ p: 3 }}>
+                    <Typography>{children}</Typography>
+                </Box>
+            )}
+        </div>
+    );
 
     return (
         <div style={{ direction: 'initial' }}>
             <Box sx={{ width: '100%', bgcolor: 'background.paper' }}>
-                <Tabs value={value} onChange={handleChange} centered
-                    scrollButtons allowScrollButtonsMobile aria-label="scrollable force tabs example"
+                <Tabs
+                    value={value}
+                    onChange={handleChange}
+                    centered
+                    scrollButtons
+                    allowScrollButtonsMobile
+                    aria-label="scrollable force tabs example"
                     variant="scrollable"
                 >
                     {tabLabels.map((label, index) => (
-                        <Tab key={index} label={label} style={{ fontSize: '16px' }} icon={<ApartmentIcon />} />
+                        <Tab
+                            key={index}
+                            label={label}
+                            style={{ fontSize: '16px' }}
+                            icon={<ApartmentIcon />}
+                        />
                     ))}
                 </Tabs>
             </Box>
-            <TabPanel value={value} index={0}>
-                Item One
-            </TabPanel>
-            <TabPanel value={value} index={1}>
-                Item Two
-            </TabPanel>
-            <TabPanel value={value} index={2}>
-                Item Three
-            </TabPanel>
+            {tabLabels.map((label, index) => {
+                const roomNumbers = generateRoomNumbers(Math.min(index + 1, 5)); // Generate room numbers
+                return (
+                    <TabPanel key={index} index={index}>
+                        <FloorInfo
+                            HospitalName={label}
+                            roomNumbers={roomNumbers}
+                            BuildingName={BuildingName}
+                        />
+                    </TabPanel>
+                );
+            })}
         </div>
     );
-}
+};
+
+export default HospitalBuildingInfo;
